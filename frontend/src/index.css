@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@layer components{
+  .primary-btn{
+    @apply bg-green-600 text-white font-semibold py-3 px-6 rounded-xl shadow-[0px_10px_14px_-7px_#de0029]
+    hover:!scale-110 duration-300;
+  }
+
+  
+}
+
+@layer utilities {
+  .custom-shadow {
+    filter: drop-shadow(-6px 8px 15px rgba(0,0,0,0.2));
+  }
+}
+
+.search-container {
+  max-width: 600px;
+  margin: 1rem auto;
+  padding: 0 1rem;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  border: 2px solid #4CAF50;
+  border-radius: 2rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+.search-button {
+  background: #4CAF50;
+  border: none;
+  border-radius: 50%;
+  padding: 0.8rem;
+  cursor: pointer;
+ 
+}
+
+.search-button:hover {
+  background: #45a049;
+}
+
+.search-icon {
+  color: white;
+  font-size: 1.2rem;
+}
