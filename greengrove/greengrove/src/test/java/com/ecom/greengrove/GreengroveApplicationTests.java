@@ -1,10 +1,10 @@
-package com.GreenGrove.backend;
+package com.ecom.greengrove;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BackendApplicationTests {
+class GreengroveApplicationTests {
 
 	@Test
 	void contextLoads() {
