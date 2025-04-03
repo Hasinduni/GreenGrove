@@ -45,7 +45,7 @@ public class PaymentController {
     public ResponseEntity<?> initiatePayment(@RequestBody Map<String, String> paymentDetails) {
         try {
             String baseUrl = "https://sandbox.payhere.lk/pay/checkout";
-            String orderId = UUID.randomUUID().toString(); // Unique Order ID
+            String orderId = UUID.randomUUID().toString();
 
 
             Map<String, String> payload = new HashMap<>();
@@ -55,7 +55,7 @@ public class PaymentController {
             payload.put("notify_url", notifyUrl);
             payload.put("order_id", orderId);
             payload.put("items", paymentDetails.get("item"));
-            payload.put("currency", "LKR"); // ✅ Always use "LKR" for Sri Lankan Rupees
+            payload.put("currency", "LKR");
             payload.put("amount", paymentDetails.get("amount"));
 
 
