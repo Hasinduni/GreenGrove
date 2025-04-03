@@ -1,45 +1,35 @@
 package com.ecom.greengrove.entity;
 
-import com.ecom.greengrove.entity.Order;
 import com.ecom.greengrove.entity.enums.PaymentStatus;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Entity
-@Table(name="payment")
+@Table(name = "payment")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Payment {
-
-
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id",nullable = false)
-
-    @JsonIgnore
-    @ToString.Exclude
-    private Order order;
+    private String paymentId;  // PayHere's payment reference
+    private Double amount;
+    private String currency;
+    private Integer statusCode;
+    private long orderId;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
-    private Date paymentDate;
-
-    @Column(nullable = false)
-    private Double amount;
-
-    @Column(nullable = false)
-    private String paymentMethod;
+    @Column(nullable = false, updatable = false)
+    private Date paymentDate = new Date();
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private PaymentStatus paymentStatus;
 }

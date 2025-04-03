@@ -16,9 +16,11 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false) // Explicitly defining foreign key column
     private Order order;
 
     @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false) // Explicitly defining foreign key column
     private Product product;
 
     private int quantity;

@@ -49,6 +49,9 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.3.0</version>
 		</dependency>
+		<!-- Modern HTTP client (Spring 5+) -->
+		<!-- For SHA-256 hashing (PayHere requirement) -->
+
 	</dependencies>
 
 	<build>

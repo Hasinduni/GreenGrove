@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 @EnableJpaRepositories
-public interface PaymentRepo extends JpaRepository<Payment, UUID> {
+public interface PaymentRepo extends JpaRepository<Payment, Long> {
 }
