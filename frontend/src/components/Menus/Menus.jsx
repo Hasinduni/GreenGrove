@@ -24,6 +24,7 @@ const Menus = ({ addToCart }) => {
     MenusData.reduce((acc, item) => ({ ...acc, [item.id]: 100 }), {})
   );
   const [searchQuery, setSearchQuery] = useState('');
+  const [clickedButtons, setClickedButtons] = useState([]);
 
   const handleSearch = useCallback((query) => {
     setSearchQuery(query.toLowerCase());
@@ -38,20 +39,28 @@ const Menus = ({ addToCart }) => {
       alert("Minimum quantity is 100g");
       return;
     }
+    const price = (item.pricePer100g * quantities[item.id]) / 100;
     addToCart({
       ...item,
       quantity: quantities[item.id],
-      price: (item.pricePer100g * quantities[item.id]) / 100
+      price: parseFloat(price.toFixed(2))
     });
+
+    // Add visual feedback
+    setClickedButtons(prev => [...prev, item.id]);
+    setTimeout(() => {
+      setClickedButtons(prev => prev.filter(id => id !== item.id));
+    }, 1000);
   };
 
   const updateQuantity = (id, grams) => {
-    setQuantities(prev => ({ ...prev, [id]: Math.max(100, grams) }));
+    const newQuantity = Math.max(100, parseInt(grams) || 100);
+    setQuantities(prev => ({ ...prev, [id]: newQuantity }));
   };
 
   return (
-    <section className="bg-gray-50 py-16">
-      <div className="container mx-auto px-4">
+    <section className="bg-gray-50 py-20">
+      <div className="container mx-auto px-5">
         <motion.h1
           initial={{ opacity: 0, x: -200 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -64,67 +73,78 @@ const Menus = ({ addToCart }) => {
         <SearchBar onSearch={handleSearch} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {filteredMenus.map((menu) => (
-            <motion.div
-              key={menu.id}
-              variants={FadeLeft(menu.delay)}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <div className="p-4">
-                <div className="flex justify-center mb-4">
-                  <img 
-                    src={menu.img} 
-                    alt={menu.title}
-                    className="h-40 w-40 object-contain"
-                  />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  {menu.title}
-                </h3>
-                <p className="text-emerald-600 font-bold mb-4">
-                  ${menu.pricePer100g.toFixed(2)}/100g
-                </p>
-
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center">
-                    <button
-                      onClick={() => updateQuantity(menu.id, quantities[menu.id] - 100)}
-                      className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
-                    >
-                      <FiMinus className="text-gray-600" />
-                    </button>
-                    <input
-                      type="number"
-                      value={quantities[menu.id]}
-                      onChange={(e) => updateQuantity(menu.id, parseInt(e.target.value) || 100)}
-                      className="mx-2 w-20 text-center border rounded-lg"
-                      min="100"
+          {filteredMenus.map((menu) => {
+            const currentQuantity = quantities[menu.id];
+            const itemPrice = (menu.pricePer100g * currentQuantity / 100).toFixed(2);
+            const isClicked = clickedButtons.includes(menu.id);
+            
+            return (
+              <motion.div
+                key={menu.id}
+                variants={FadeLeft(menu.delay)}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <div className="p-4">
+                  <div className="flex justify-center mb-4">
+                    <img 
+                      src={menu.img} 
+                      alt={menu.title}
+                      className="h-40 w-40 object-contain"
                     />
-                    <button
-                      onClick={() => updateQuantity(menu.id, quantities[menu.id] + 100)}
-                      className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
-                    >
-                      <FiPlus className="text-gray-600" />
-                    </button>
                   </div>
-                  <span className="text-gray-600">
-                    {quantities[menu.id]}g
-                  </span>
-                </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    {menu.title}
+                  </h3>
+                  <p className="text-emerald-600 font-bold mb-4">
+                    Rs:{menu.pricePer100g.toFixed(2)}/100g
+                  </p>
+                  <p className="text-gray-600 mb-2">
+                    Total: Rs:{itemPrice} for {currentQuantity}g
+                  </p>
 
-                <button
-                  onClick={() => handleAddToCart(menu)}
-                  className="w-full flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-lg transition-colors"
-                >
-                  <FiShoppingCart className="mr-2" />
-                  Add to Cart
-                </button>
-              </div>
-            </motion.div>
-          ))}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <button
+                        onClick={() => updateQuantity(menu.id, currentQuantity - 100)}
+                        className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
+                      >
+                        <FiMinus className="text-gray-600" />
+                      </button>
+                      <input
+                        type="number"
+                        value={currentQuantity}
+                        onChange={(e) => updateQuantity(menu.id, e.target.value)}
+                        className="mx-2 w-20 text-center border rounded-lg"
+                        min="100"
+                      />
+                      <button
+                        onClick={() => updateQuantity(menu.id, currentQuantity + 100)}
+                        className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
+                      >
+                        <FiPlus className="text-gray-600" />
+                      </button>
+                    </div>
+                    <span className="text-gray-600">
+                      {currentQuantity}g
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => handleAddToCart(menu)}
+                    className={`w-full flex items-center justify-center ${
+                      isClicked ? 'bg-green-500 scale-95' : 'bg-emerald-500 hover:bg-emerald-600'
+                    } text-white py-2 rounded-lg transition-all duration-200`}
+                  >
+                    <FiShoppingCart className={`mr-2 ${isClicked ? 'animate-bounce' : ''}`} />
+                    {isClicked ? 'Added!' : `Add to Cart (Rs:${itemPrice})`}
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

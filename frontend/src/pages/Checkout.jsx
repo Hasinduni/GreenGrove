@@ -1,51 +1,117 @@
 import React, { useState } from 'react';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { FiArrowLeft } from 'react-icons/fi';
 import { FaCreditCard, FaCcVisa, FaCcMastercard } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 const Checkout = ({ cartItems, calculateTotal }) => {
-  const stripe = useStripe();
-  const elements = useElements();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [cardDetails, setCardDetails] = useState({
+    number: '',
+    expiry: '',
+    cvc: ''
+  });
+
+  const handleCardChange = (e) => {
+    const { name, value } = e.target;
+    setCardDetails(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
-
     setLoading(true);
     setError(null);
 
+    // Basic validation
+    if (!cardDetails.number || !cardDetails.expiry || !cardDetails.cvc) {
+      setError('Please fill all card details');
+      setLoading(false);
+      return;
+    }
+
     try {
-      // In a real app, you would fetch this from your backend
-      const response = await fetch('/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: calculateTotal() * 100 }), // Convert to cents
-      });
-      
-      const { clientSecret } = await response.json();
+      // In a real app, you would get these from your backend
+      const paymentData = {
+        sandbox: true, // Set to false for production
+        merchant_id: 'YOUR_MERCHANT_ID', // Replace with your PayHere merchant ID
+        return_url: 'http://yourwebsite.com/payment-success',
+        cancel_url: 'http://yourwebsite.com/payment-cancel',
+        notify_url: 'http://yourwebsite.com/payment-notify',
+        first_name: 'Customer', // Get from form
+        last_name: 'Name', // Get from form
+        email: 'customer@example.com', // Get from form
+        phone: '0771234567', // Get from form
+        address: 'No.1, Galle Road', // Get from form
+        city: 'Colombo', // Get from form
+        country: 'Sri Lanka', // Get from form
+        order_id: 'ORDER_' + Math.random().toString(36).substr(2, 9),
+        items: cartItems.map(item => item.title).join(', '),
+        amount: calculateTotal().toFixed(2),
+        currency: 'LKR',
+        hash: 'GENERATED_HASH', // Generate this on your backend
+        // Card details that will be pre-filled in PayHere modal
+        card_number: cardDetails.number.replace(/\s/g, ''),
+        card_expiry: cardDetails.expiry,
+        card_cvv: cardDetails.cvc
+      };
 
-      const { error: stripeError } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement),
+      // Create PayHere checkout
+      const payhere = new window.PayHere({
+        onCompleted: function(orderId) {
+          setPaymentSuccess(true);
+          console.log("Payment completed. Order ID:" + orderId);
         },
+        onDismissed: function() {
+          setError("Payment was dismissed by the user");
+          setLoading(false);
+        },
+        onError: function(error) {
+          setError("Payment failed: " + error);
+          setLoading(false);
+        }
       });
 
-      if (stripeError) {
-        setError(stripeError.message);
-      } else {
-        setPaymentSuccess(true);
-        // Here you would typically clear the cart and show success
-      }
+      payhere.startPayment(paymentData);
+
     } catch (err) {
       setError("Payment failed. Please try again.");
-    } finally {
       setLoading(false);
     }
   };
+
+  // Format card number as user types
+  const formatCardNumber = (e) => {
+    let value = e.target.value.replace(/\D/g, '');
+    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    e.target.value = value;
+    handleCardChange(e);
+  };
+
+  // Format expiry date as MM/YY
+  const formatExpiry = (e) => {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 2) {
+      value = value.substring(0, 2) + '/' + value.substring(2, 4);
+    }
+    e.target.value = value;
+    handleCardChange(e);
+  };
+
+  // Load PayHere script dynamically
+  React.useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://www.payhere.lk/lib/payhere.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -97,42 +163,65 @@ const Checkout = ({ cartItems, calculateTotal }) => {
               </div>
               <form onSubmit={handleSubmit}>
                 <div className="mb-4">
-                  <label className="block text-gray-700 font-semibold mb-2">Enter your card information</label>
-                  <div className="border rounded p-3 bg-gray-50">
-                    <CardElement 
-                      options={{
-                        style: {
-                          base: {
-                            fontSize: '16px',
-                            color: '#424770',
-                            '::placeholder': {
-                              color: 'transparent', // Makes placeholder text invisible
-                            },
-                          },
-                          invalid: {
-                            color: '#9e2146',
-                          },
-                        },
-                        hidePostalCode: true,
-                        placeholder: '', // Empty placeholder text
-                      }}
-                    />
+                  <label className="block text-gray-700 font-semibold mb-2">Card Number</label>
+                  <input
+                    type="text"
+                    name="number"
+                    placeholder="1234 5678 9012 3456"
+                    className="w-full p-2 border rounded bg-gray-50 mb-3"
+                    maxLength="19"
+                    onChange={formatCardNumber}
+                    required
+                  />
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-gray-700 font-semibold mb-2">Expiration Date</label>
+                      <input
+                        type="text"
+                        name="expiry"
+                        placeholder="MM/YY"
+                        className="w-full p-2 border rounded bg-gray-50"
+                        maxLength="5"
+                        onChange={formatExpiry}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-700 font-semibold mb-2">CVV</label>
+                      <input
+                        type="text"
+                        name="cvc"
+                        placeholder="123"
+                        className="w-full p-2 border rounded bg-gray-50"
+                        maxLength="4"
+                        onChange={handleCardChange}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">Expiration Date</label>
-                    <input type="text" placeholder="MM/YY" className="w-full p-2 border rounded bg-gray-50" />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">CVV</label>
-                    <input type="text" placeholder="XXX" className="w-full p-2 border rounded bg-gray-50" />
-                  </div>
+                
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-semibold mb-2">Billing Information</label>
+                  <input 
+                    type="text" 
+                    placeholder="Full Name" 
+                    className="w-full p-2 border rounded bg-gray-50 mb-3" 
+                    required
+                  />
+                  <input 
+                    type="email" 
+                    placeholder="Email" 
+                    className="w-full p-2 border rounded bg-gray-50 mb-3" 
+                    required
+                  />
                 </div>
+                
                 {error && <div className="text-red-500 mb-4">{error}</div>}
                 <button
                   type="submit"
-                  disabled={!stripe || loading}
+                  disabled={loading}
                   className="w-full py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-300 transition-colors"
                 >
                   {loading ? "Processing..." : `Pay Rs ${calculateTotal()}`}

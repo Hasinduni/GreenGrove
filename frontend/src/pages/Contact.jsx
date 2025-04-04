@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaPaperPlane, FaClock } from 'react-icons/fa';
 import { FiCheckCircle } from 'react-icons/fi';
-import contactHero from '../assets/contact.jpg'; // Update with your actual image filename
+import contactHero from '../assets/contact.jpg'; 
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -48,8 +48,8 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold">Visit Us</h3>
-                    <p className="text-gray-600">123 Organic Farm Road</p>
-                    <p className="text-gray-600">Green Valley, EC 12345</p>
+                    <p className="text-gray-600">main street</p>
+                    <p className="text-gray-600">Weerawila,Thissamaharama</p>
                   </div>
                 </div>
 
@@ -59,7 +59,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold">Call Us</h3>
-                    <p className="text-gray-600">+1 (123) 456-7890</p>
+                    <p className="text-gray-600">+94-7755411</p>
                     <p className="text-sm text-gray-500">Mon-Fri, 9am-5pm</p>
                   </div>
                 </div>

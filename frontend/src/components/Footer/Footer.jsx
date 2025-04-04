@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FaFacebookF, FaTwitter, FaInstagram, FaLeaf, FaEnvelope, FaPhone, FaMapMarker } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
@@ -13,10 +14,10 @@ function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            <div className="text-2xl flex items-center gap-2 font-bold">
+            <Link to="/" className="text-2xl flex items-center gap-2 font-bold">
               <FaLeaf className="text-green-400" />
               <span>GreenGrove</span>
-            </div>
+            </Link>
             <p className="text-sm text-green-100">
               Fresh organic vegetables delivered to your doorstep. 
               Committed to quality and sustainable farming.
@@ -31,10 +32,10 @@ function Footer() {
           >
             <h3 className="text-lg font-semibold">Quick Links</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#home" className="hover:text-green-300 transition">Home</a></li>
-              <li><a href="#shop" className="hover:text-green-300 transition">Shop</a></li>
-              <li><a href="#about" className="hover:text-green-300 transition">About</a></li>
-              <li><a href="#contact" className="hover:text-green-300 transition">Contact</a></li>
+              <li><Link to="/" className="hover:text-green-300 transition">Home</Link></li>
+              <li><Link to="/products" className="hover:text-green-300 transition">Shop</Link></li>
+              <li><Link to="/about" className="hover:text-green-300 transition">About</Link></li>
+              <li><Link to="/contact" className="hover:text-green-300 transition">Contact</Link></li>
             </ul>
           </motion.div>
 
@@ -48,11 +49,11 @@ function Footer() {
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <FaMapMarker className="text-green-400" />
-                <span>123 Green Street, Farmville</span>
+                <span>No:88, Main Street, Weerawila, Thissamaharama</span>
               </div>
               <div className="flex items-center gap-2">
                 <FaPhone className="text-green-400" />
-                <span>+1 (555) 123-4567</span>
+                <span>+94-7755411</span>
               </div>
               <div className="flex items-center gap-2">
                 <FaEnvelope className="text-green-400" />
@@ -90,15 +91,21 @@ function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-green-700 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
           <div className="flex gap-4">
-            <a href="#terms" className="hover:text-green-300 transition">Terms of Service</a>
-            <a href="#privacy" className="hover:text-green-300 transition">Privacy Policy</a>
+            <Link to="/terms" className="hover:text-green-300 transition">Terms of Service</Link>
+            <Link to="/privacy" className="hover:text-green-300 transition">Privacy Policy</Link>
           </div>
           <div className="flex gap-4 text-xl">
-            <FaFacebookF className="hover:text-green-300 cursor-pointer transition" />
-            <FaTwitter className="hover:text-green-300 cursor-pointer transition" />
-            <FaInstagram className="hover:text-green-300 cursor-pointer transition" />
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-green-300 transition">
+              <FaFacebookF />
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-green-300 transition">
+              <FaTwitter />
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-green-300 transition">
+              <FaInstagram />
+            </a>
           </div>
-          <div>© 2023 GreenGrove. All rights reserved.</div>
+          <div>© 2024 GreenGrove. All rights reserved.</div>
         </div>
       </div>
     </footer>
