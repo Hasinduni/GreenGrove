@@ -3,7 +3,6 @@ package com.ecom.greengrove.dto;
 import com.ecom.greengrove.entity.Customer;
 import com.ecom.greengrove.entity.OrderItem;
 import com.ecom.greengrove.entity.enums.OrderStatus;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,4 +22,7 @@ public class OrderDto {
     private double totalAmount;
     private OrderStatus status; // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
     private List<OrderItem> orderItems;
+
+    public OrderDto(Long id, LocalDateTime orderDate, List<OrderItem> orderItems, Customer customer, double totalAmount) {
+    }
 }
