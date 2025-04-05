@@ -17,12 +17,15 @@ public class OrderDto {
 
 
     private Long id;
-    private Customer customer;
+    private Long customer;
     private LocalDateTime orderDate;
     private double totalAmount;
     private OrderStatus status; // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
     private List<OrderItem> orderItems;
 
-    public OrderDto(Long id, LocalDateTime orderDate, List<OrderItem> orderItems, Customer customer, double totalAmount) {
-    }
+
 }
+
+
+
+

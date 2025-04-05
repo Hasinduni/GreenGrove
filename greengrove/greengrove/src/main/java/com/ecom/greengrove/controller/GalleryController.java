@@ -3,6 +3,7 @@ package com.ecom.greengrove.controller;
 import com.ecom.greengrove.dto.GalleryDto;
 import com.ecom.greengrove.entity.Gallery;
 import com.ecom.greengrove.entity.enums.GalleryCategory;
+import com.ecom.greengrove.service.GalleryService;
 import com.ecom.greengrove.service.Impl.GalleryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import java.util.List;
 public class GalleryController {
 
     @Autowired
-    private GalleryServiceImpl galleryService;
+    private GalleryService galleryService;
 
     @PostMapping("/add")
     public ResponseEntity<String> addGallery(@RequestBody GalleryDto galleryDto) {

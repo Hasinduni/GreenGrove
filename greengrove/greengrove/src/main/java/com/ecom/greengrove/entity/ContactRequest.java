@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -24,4 +26,6 @@ public class ContactRequest {
 
     @ManyToOne
     private User user;
+
+    private LocalDateTime submittedAt = LocalDateTime.now();
 }

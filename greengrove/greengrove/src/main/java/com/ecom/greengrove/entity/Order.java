@@ -1,5 +1,6 @@
 package com.ecom.greengrove.entity;
 
+import com.ecom.greengrove.dto.OrderItemDto;
 import com.ecom.greengrove.entity.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,4 +32,7 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+    }
 }

@@ -15,12 +15,13 @@ public class OrderItemDto {
     private Long id;
 
 
-    private Order order;
+    private Long order;
 
 
-    private Product product;
+    private Long product;
 
     private int quantity;
     private double unitPrice;
+
 
 }

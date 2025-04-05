@@ -1,6 +1,7 @@
 package com.ecom.greengrove.service;
 
 import com.ecom.greengrove.dto.OrderDto;
+import com.ecom.greengrove.entity.Order;
 
 import java.util.List;
 
@@ -9,9 +10,12 @@ public interface OrderService {
 
     String deleteOrder(Long orderId);
 
-    List<OrderDto> getOrdersByCustomerId(Long customerId);
+
 
     String updateOrder(Long orderId, OrderDto orderDto);
 
-    OrderDto getOrderById(Long orderId);
+
+    Order getOrderById(Long orderId);
+
+    List<Order> getOrdersByCustomerId(Long customerId);
 }

@@ -20,7 +20,7 @@ public class PaymentDto {
 
     private UUID id;
 
-    private Order order;
+    private long orderId;
 
     private Date paymentDate;
 

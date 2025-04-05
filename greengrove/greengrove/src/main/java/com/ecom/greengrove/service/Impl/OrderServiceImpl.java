@@ -1,35 +1,42 @@
 package com.ecom.greengrove.service.Impl;
 
 import com.ecom.greengrove.dto.OrderDto;
+import com.ecom.greengrove.entity.Customer;
 import com.ecom.greengrove.entity.Order;
+import com.ecom.greengrove.repo.CustomerRepo;
 import com.ecom.greengrove.repo.OrderRepo;
 import com.ecom.greengrove.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-  private   OrderRepo orderRepo;
+    private OrderRepo orderRepo;
+
+    @Autowired
+    private CustomerRepo customerRepo;
 
     @Override
     public String addOrder(OrderDto orderDto) {
+        Customer customer = customerRepo.findById(orderDto.getCustomer())
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
         Order order = new Order();
         order.setOrderDate(orderDto.getOrderDate());
         order.setOrderItems(orderDto.getOrderItems());
-        order.setCustomer(orderDto.getCustomer());
+        order.setCustomer(customer);
         order.setTotalAmount(orderDto.getTotalAmount());
+        order.setStatus(orderDto.getStatus());
+
         orderRepo.save(order);
-        return ("order added successfully");
+        return "Order added successfully";
     }
+
     @Override
     public String deleteOrder(Long orderId) {
         if (orderRepo.existsById(orderId)) {
@@ -40,28 +47,21 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    @Override
-    public List<OrderDto> getOrdersByCustomerId(Long customerId) {
-        Optional<Order> orders = orderRepo.findById(customerId);
-        return orders.stream()
-                .map(order -> new OrderDto(
-                        order.getId(),
-                        order.getOrderDate(),
-                        order.getOrderItems(),
-                        order.getCustomer(),
-                        order.getTotalAmount()
-                ))
-                .collect(Collectors.toList());
-    }
+  
+
     @Override
     public String updateOrder(Long orderId, OrderDto orderDto) {
         Optional<Order> existingOrder = orderRepo.findById(orderId);
         if (existingOrder.isPresent()) {
+            Customer customer = customerRepo.findById(orderDto.getCustomer())
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+
             Order order = existingOrder.get();
             order.setOrderDate(orderDto.getOrderDate());
             order.setOrderItems(orderDto.getOrderItems());
-            order.setCustomer(orderDto.getCustomer());
+            order.setCustomer(customer);
             order.setTotalAmount(orderDto.getTotalAmount());
+            order.setStatus(orderDto.getStatus());
 
             orderRepo.save(order);
             return "Order updated successfully";
@@ -69,20 +69,19 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Order not found with ID: " + orderId);
         }
     }
-
-
     @Override
-    public OrderDto getOrderById(Long orderId) {
-        Order order = orderRepo.findById(orderId)
+    public Order getOrderById(Long orderId) {
+        return orderRepo.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+    }
+    @Override
+    public List<Order> getOrdersByCustomerId(Long customerId) {
+        // First verify customer exists
+        if (!customerRepo.existsById(customerId)) {
+            throw new RuntimeException("Customer not found with ID: " + customerId);
+        }
 
-        return new OrderDto(
-                order.getId(),
-                order.getOrderDate(),
-                order.getOrderItems(),
-                order.getCustomer(),
-                order.getTotalAmount()
-        );
+        return orderRepo.findByCustomerId(customerId);
     }
 
 }

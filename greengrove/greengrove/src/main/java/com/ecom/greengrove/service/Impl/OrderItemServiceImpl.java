@@ -33,8 +33,8 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public String addOrderItem(OrderItemDto orderItemDto) {
-        Optional<Order> order = orderRepo.findById(orderItemDto.getOrder().getId());
-        Optional<Product> product = productRepo.findById(orderItemDto.getProduct().getId());
+        Optional<Order> order = orderRepo.findById(orderItemDto.getOrder());
+        Optional<Product> product = productRepo.findById(orderItemDto.getProduct());
 
         if (order.isEmpty() || product.isEmpty()) {
             throw new RuntimeException("Invalid order or product ID");
