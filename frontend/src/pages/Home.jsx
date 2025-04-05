@@ -12,7 +12,7 @@ const Home = () => {
     <>
       <Hero /> 
             {/* Your existing Hero component */}
-      <Menus />
+    
       <Banner />
       <Banner2 />
       <Banner3 />
