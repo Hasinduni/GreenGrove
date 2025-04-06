@@ -13,11 +13,12 @@ import java.util.List;
 public class ContactRequestController {
 @Autowired
 private ContactRequestService contactRequestService;
-    @PostMapping("save")
+    @PostMapping("/save")
     public ResponseEntity<String> saveMessage(@RequestBody ContactRequestDto contactRequestDto) {
-        String response = contactRequestService.SaveMassege(contactRequestDto);
+        String response = contactRequestService.saveMessage(contactRequestDto);  // Corrected method name
         return ResponseEntity.ok(response);
     }
+
 
     // GET: Get all messages
     @GetMapping("/all-message")

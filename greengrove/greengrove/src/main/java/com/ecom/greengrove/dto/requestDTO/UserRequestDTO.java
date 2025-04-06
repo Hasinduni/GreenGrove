@@ -3,6 +3,7 @@ package com.ecom.greengrove.dto.requestDTO;
 import com.ecom.greengrove.entity.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class UserRequestDTO {
 
     @NotBlank
     private String password;
-
+    @NotNull
     private Role role;
 
     private String deliveryAddress;

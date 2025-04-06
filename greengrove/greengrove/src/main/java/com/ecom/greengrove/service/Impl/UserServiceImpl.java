@@ -1,7 +1,9 @@
 package com.ecom.greengrove.service.Impl;
 
 import com.ecom.greengrove.config.PasswordValidator;
+import com.ecom.greengrove.dto.LoginRequestDTO;
 import com.ecom.greengrove.dto.requestDTO.UserRequestDTO;
+import com.ecom.greengrove.dto.responseDTO.LoginResponseDTO;
 import com.ecom.greengrove.entity.Customer;
 import com.ecom.greengrove.entity.User;
 import com.ecom.greengrove.exception.*;
@@ -12,6 +14,8 @@ import com.ecom.greengrove.util.TokenUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -70,10 +74,11 @@ public class UserServiceImpl implements UserService {
     }
 
     private void sendVerificationEmail(User user) {
-        String verifyUrl = "http://yourdomain.com/api/user/verify?token=" + user.getVerificationToken();
+        String verifyUrl = "http://localhost:8110/api/user/verify?token=" + user.getVerificationToken();
         String emailBody = "Please click the following link to verify your email: " + verifyUrl;
         emailService.sendEmail(user.getEmail(), "Verify Your Email", emailBody);
     }
+
 
 
     @Override
@@ -106,5 +111,21 @@ public class UserServiceImpl implements UserService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepo.save(user);
+    }
+
+    @Override
+    public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
+        User user = (User) userRepo.findByEmail(loginRequestDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+
+        // Validate password
+        if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        // Generate JWT token
+        String token = jwtUtil.generateToken(user);
+
+        return new LoginResponseDTO(token, "Login successful");
     }
 }

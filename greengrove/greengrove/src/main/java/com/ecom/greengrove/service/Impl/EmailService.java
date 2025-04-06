@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
-    @Value("")
+    @Value("http:// localhost:8110/ api/ user/ verify")
     private String verificationUrl;
 
     private final JavaMailSender mailSender;

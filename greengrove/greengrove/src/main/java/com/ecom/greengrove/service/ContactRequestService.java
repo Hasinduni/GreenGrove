@@ -6,9 +6,10 @@ import java.util.List;
 
 public interface ContactRequestService {
 
+
     String saveMessage(ContactRequestDto contactRequestDto);
 
     List<ContactRequestDto> getAllMessages();
 
-    String SaveMassege(ContactRequestDto contactRequestDto);
+
 }

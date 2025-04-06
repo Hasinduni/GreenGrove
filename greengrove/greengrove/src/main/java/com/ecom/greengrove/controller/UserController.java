@@ -1,6 +1,8 @@
 package com.ecom.greengrove.controller;
 
+import com.ecom.greengrove.dto.LoginRequestDTO;
 import com.ecom.greengrove.dto.requestDTO.UserRequestDTO;
+import com.ecom.greengrove.dto.responseDTO.LoginResponseDTO;
 import com.ecom.greengrove.service.Impl.UserServiceImpl;
 import com.ecom.greengrove.service.UserService;
 import com.ecom.greengrove.util.StandardResponse;
@@ -24,6 +26,8 @@ public class UserController {
                 HttpStatus.CREATED);
     }
 
+
+
     @GetMapping("/verify")
     public ResponseEntity<StandardResponse> verifyEmail(@RequestParam String token) {
         boolean verified = userService.verifyUser(token);
@@ -44,5 +48,12 @@ public class UserController {
                 HttpStatus.OK
         );
     }
-
+    @PostMapping("/login")
+    public ResponseEntity<StandardResponse> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+        LoginResponseDTO response = userService.login(loginRequestDTO);
+        return new ResponseEntity<StandardResponse>(
+                new StandardResponse(200, response.getMessage(), response.getToken()),
+                HttpStatus.OK
+        );
+    }
 }

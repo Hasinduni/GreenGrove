@@ -19,7 +19,7 @@ public class JwtServiceIMPL implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         // Corrected repository method call to match the fixed UserRepo
-        User user = (User) userRepository.findByUsernameIgnoreCaseAndIsDeletedFalse(username)
+        User user = (User) userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
         return new org.springframework.security.core.userdetails.User(

@@ -58,8 +58,7 @@ public class ContactRequestServiceImpl implements ContactRequestService {
         }).toList();
     }
 
-    @Override
-    public String SaveMassege(ContactRequestDto contactRequestDto) {
-        return "";
-    }
+
+
+
 }
