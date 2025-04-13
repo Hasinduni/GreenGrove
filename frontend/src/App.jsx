@@ -7,13 +7,15 @@ import Footer from './components/Footer/Footer';
 import Home from './pages/Home';
 import Products from './pages/Product';
 import Cart from './pages/Cart';
-import Checkout from './pages/Checkout'; // New component we'll create
+import Checkout from './pages/Checkout'; 
 import About from './pages/About';
 import Contact from './pages/Contact';
 import SignIn from './pages/SignIn';
 import GetStarted from './pages/GetStarted';
 import Gallery from './components/Galley/Gallery';
-
+import AdminProductManage from './pages/Admin/AdminProductManage';
+import AdminOrders from './pages/Admin/AdminOrders';
+import AdminHome from './pages/Admin/AdminHome';
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe('pk_test_YOUR_STRIPE_PUBLIC_KEY');
 
@@ -81,6 +83,12 @@ const App = () => {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="gallery" element={<Gallery/>}/>
+
+
+          
+          <Route path="/admin/products" element={<AdminProductManage />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/a-home" element={<AdminHome />} />
         </Routes>
         <Footer />
       </Elements>

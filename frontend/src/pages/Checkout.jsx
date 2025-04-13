@@ -47,7 +47,27 @@ const Checkout = ({ cartItems, calculateTotal }) => {
     const { name, value } = e.target;
     setAddress(prev => ({ ...prev, [name]: value }));
   };
+  const submitAddress = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/delivery', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(address),
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to submit address');
+      }
+
+      const result = await response.text();
+      console.log('Address submitted successfully:', result);
+    } catch (error) {
+      console.error('Error submitting address:', error);
+      setError('Failed to submit address. Please try again.');
+    }
+  };
   // Handle card input changes
   const handleCardChange = (e) => {
     const { name, value } = e.target;

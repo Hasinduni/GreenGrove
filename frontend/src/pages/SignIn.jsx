@@ -1,33 +1,85 @@
 import React, { useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordMsg, setForgotPasswordMsg] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg("");
     setIsLoading(true);
+    setErrorMsg("");
 
     try {
-      const res = await axiosInstance.post("/user/login", {
+      const response = await axiosInstance.post("/api/user/login", {
         email,
-        password,
+        password
       });
 
-      const token = res.data.data;
+      const token = response.data.data;
       localStorage.setItem("token", token);
-      navigate("/");
+      const decoded = jwtDecode(token);
+      
+      alert("Login Successful!");
+      
+      switch (decoded.role) {
+        case "CUSTOMER":
+          navigate("/");
+          break;
+        case "ADMIN":
+          navigate("/a-home");
+          break;
+        default:
+          alert("Unknown role. Please contact support.");
+          navigate("/");
+      }
     } catch (error) {
-      console.error("Login error:", error);
-      setErrorMsg(error.response?.data?.message || "Invalid credentials. Please try again.");
+      if (error.response?.status === 403) {
+        setErrorMsg("Your email is not verified. Please check your inbox.");
+        setShowResend(true);
+      } else {
+        setErrorMsg(error.response?.data?.message || "Login failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      await axiosInstance.get(
+        `/api/user/resend-verification-email?email=${encodeURIComponent(email)}`
+      );
+      setErrorMsg("Verification email resent - please check your inbox");
+      setShowResend(false);
+    } catch (error) {
+      setErrorMsg("Failed to resend verification email. Please try again.");
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!forgotPasswordEmail) {
+      setForgotPasswordMsg("Please enter your email address.");
+      return;
+    }
+
+    try {
+      await axiosInstance.post(
+        `/api/auth/forgot-password?email=${encodeURIComponent(forgotPasswordEmail)}`
+      );
+      setForgotPasswordMsg("Password reset instructions sent to your email");
+    } catch (error) {
+      setForgotPasswordMsg(
+        error.response?.data?.message || "Failed to send password reset email."
+      );
     }
   };
 
@@ -39,13 +91,21 @@ const SignIn = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
             <p className="text-gray-600">Sign in to your account</p>
           </div>
-          
+
           {errorMsg && (
-            <div className="mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+            <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
               {errorMsg}
+              {showResend && (
+                <button
+                  onClick={handleResendVerification}
+                  className="ml-2 text-emerald-600 hover:text-emerald-700 font-medium"
+                >
+                  Resend verification email
+                </button>
+              )}
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -61,15 +121,19 @@ const SignIn = () => {
                 placeholder="you@example.com"
               />
             </div>
-            
+
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <a href="#" className="text-sm text-emerald-600 hover:text-emerald-700">
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('forgot-password-modal').showModal()}
+                  className="text-sm text-emerald-600 hover:text-emerald-700"
+                >
                   Forgot password?
-                </a>
+                </button>
               </div>
               <input
                 id="password"
@@ -81,11 +145,13 @@ const SignIn = () => {
                 placeholder="••••••••"
               />
             </div>
-            
+
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full py-3 px-4 rounded-lg font-medium text-white ${isLoading ? 'bg-emerald-400' : 'bg-emerald-600 hover:bg-emerald-700'} transition flex justify-center items-center`}
+              className={`w-full py-3 px-4 rounded-lg font-medium text-white ${
+                isLoading ? 'bg-emerald-400' : 'bg-emerald-600 hover:bg-emerald-700'
+              } transition flex justify-center items-center`}
             >
               {isLoading ? (
                 <>
@@ -95,18 +161,60 @@ const SignIn = () => {
                   </svg>
                   Signing in...
                 </>
-              ) : 'Sign in'}
+              ) : (
+                'Sign in'
+              )}
             </button>
           </form>
-          
+
           <div className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{' '}
-            <a href="#" className="font-medium text-emerald-600 hover:text-emerald-500">
+            <button
+              onClick={() => navigate("/sign-up")}
+              className="font-medium text-emerald-600 hover:text-emerald-500"
+            >
               Sign up
-            </a>
+            </button>
           </div>
         </div>
-        
+
+        {/* Forgot Password Modal */}
+        <dialog id="forgot-password-modal" className="modal">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Forgot Password</h3>
+            <div className="py-4">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={forgotPasswordEmail}
+                onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg mb-4"
+              />
+              {forgotPasswordMsg && (
+                <p className={`text-sm ${
+                  forgotPasswordMsg.includes("sent") ? "text-green-600" : "text-red-600"
+                }`}>
+                  {forgotPasswordMsg}
+                </p>
+              )}
+            </div>
+            <div className="modal-action">
+              <button
+                className="btn bg-emerald-600 text-white hover:bg-emerald-700"
+                onClick={handleForgotPassword}
+              >
+                Send Reset Link
+              </button>
+              <button
+                className="btn ml-2"
+                onClick={() => document.getElementById('forgot-password-modal').close()}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </dialog>
+
         <div className="mt-6 text-center text-xs text-gray-500">
           By continuing, you agree to our Terms of Service and Privacy Policy.
         </div>
