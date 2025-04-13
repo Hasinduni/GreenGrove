@@ -1,6 +1,10 @@
 package com.ecom.greengrove.config;
 
+import com.ecom.greengrove.entity.User;
+import com.ecom.greengrove.entity.enums.Role;
+import com.ecom.greengrove.repo.UserRepo;
 import com.ecom.greengrove.service.Impl.JwtServiceIMPL;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -50,4 +54,8 @@ public class SecurityConfig {
         return new ProviderManager(provider);
     }
 
-}
+    }
+
+
+
+
